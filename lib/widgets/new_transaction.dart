@@ -1,5 +1,8 @@
 import 'dart:ffi';
+import 'dart:io';
 
+import 'package:expense_planner/widgets/adaptive_flat_button.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -53,52 +56,54 @@ class _NewTransactionState extends State<NewTransaction> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 5,
-      child: Container(
-          padding: EdgeInsets.all(10),
-          // ignore: prefer_const_literals_to_create_immutables
-          child: Column(crossAxisAlignment: CrossAxisAlignment.end,
-              // ignore: prefer_const_literals_to_create_immutables
-              children: [
-                TextField(
-                  controller: _titleController,
-                  decoration: InputDecoration(labelText: 'Enter Title'),
-                  onSubmitted: (_) => _SubmitData(),
-                ),
-                TextField(
-                  controller: _amountController,
-                  decoration: InputDecoration(labelText: 'Amount'),
-                  keyboardType: TextInputType.number,
-                  onSubmitted: (_) => _SubmitData(),
-                ),
-                Container(
-                  height: 70,
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(_date == null
-                            ? 'No Date Chosen'
-                            : DateFormat.yMd().format(_date)),
-                      ),
-                      FlatButton(
-                        onPressed: _presentDatePiker,
-                        child: Text(
-                          'Choose Date',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        textColor: Theme.of(context).primaryColor,
-                      )
-                    ],
+    final mediaQuery = MediaQuery.of(context);
+    final theme = Theme.of(context);
+    return SingleChildScrollView(
+      child: Card(
+        elevation: 5,
+        child: Container(
+            padding: EdgeInsets.only(
+                top: 10,
+                left: 10,
+                right: 10,
+                bottom: mediaQuery.viewInsets.bottom + 10),
+            // ignore: prefer_const_literals_to_create_immutables
+            child: Column(crossAxisAlignment: CrossAxisAlignment.end,
+                // ignore: prefer_const_literals_to_create_immutables
+                children: [
+                  TextField(
+                    controller: _titleController,
+                    decoration: InputDecoration(labelText: 'Enter Title'),
+                    onSubmitted: (_) => _SubmitData(),
                   ),
-                ),
-                RaisedButton(
-                  child: Text('Add Transaction'),
-                  color: Theme.of(context).primaryColor,
-                  textColor: Theme.of(context).textTheme.button?.color,
-                  onPressed: _SubmitData,
-                )
-              ])),
+                  TextField(
+                    controller: _amountController,
+                    decoration: InputDecoration(labelText: 'Amount'),
+                    keyboardType: TextInputType.number,
+                    onSubmitted: (_) => _SubmitData(),
+                  ),
+                  Container(
+                    height: 70,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(_date == null
+                              ? 'No Date Chosen'
+                              : DateFormat.yMd().format(_date)),
+                        ),
+                        AdaptiveFlatButton(
+                            text: 'Chose Date', handler: _presentDatePiker)
+                      ],
+                    ),
+                  ),
+                  RaisedButton(
+                    child: Text('Add Transaction'),
+                    color: theme.primaryColor,
+                    textColor: theme.textTheme.button?.color,
+                    onPressed: _SubmitData,
+                  )
+                ])),
+      ),
     );
   }
 }

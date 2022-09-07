@@ -14,6 +14,8 @@ class TransactionList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final theme = Theme.of(context);
     return transactions.isEmpty
         ? LayoutBuilder(builder: ((context, constraints) {
             return Column(
@@ -36,11 +38,10 @@ class TransactionList extends StatelessWidget {
                 margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
                 decoration: BoxDecoration(
                     color: Colors.white,
-                    border: Border.all(
-                        color: Theme.of(context).primaryColor, width: 2.0)),
+                    border: Border.all(color: theme.primaryColor, width: 2.0)),
                 child: Text(
                     '\$${transactions[index].amount.toStringAsFixed(2)}',
-                    style: Theme.of(context).textTheme.headline2),
+                    style: theme.textTheme.headline2),
               );
 
               return Card(
@@ -57,15 +58,21 @@ class TransactionList extends StatelessWidget {
                   ),
                   title: Text(
                     transactions[index].title,
-                    style: Theme.of(context).textTheme.titleMedium,
+                    style: theme.textTheme.titleMedium,
                   ),
                   subtitle:
                       Text(DateFormat.yMMMd().format(transactions[index].date)),
-                  trailing: IconButton(
-                    icon: Icon(Icons.delete),
-                    color: Theme.of(context).errorColor,
-                    onPressed: () => deleteTx(transactions[index].id),
-                  ),
+                  trailing: mediaQuery.size.width > 260
+                      ? FlatButton.icon(
+                          icon: Icon(Icons.delete),
+                          label: Text('Delete'),
+                          textColor: theme.errorColor,
+                          onPressed: () => deleteTx(transactions[index].id))
+                      : IconButton(
+                          icon: Icon(Icons.delete),
+                          color: theme.errorColor,
+                          onPressed: () => deleteTx(transactions[index].id),
+                        ),
                 ),
               );
             },

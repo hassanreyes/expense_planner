@@ -1,7 +1,9 @@
+import 'dart:io';
 // ignore_for_file: prefer_const_constructors, deprecated_member_use
 import 'package:expense_planner/widgets/chart.dart';
 import 'package:expense_planner/widgets/new_transaction.dart';
 import 'package:expense_planner/widgets/transaction_list.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 
 import 'models/transaction.dart';
@@ -107,66 +109,93 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final isLanscape =
-        MediaQuery.of(context).orientation == Orientation.landscape;
-    final appBar = AppBar(
-      title: Text(widget.title),
-      actions: [
-        IconButton(
-            onPressed: () => _startAddNewTransaction(context),
-            icon: Icon(Icons.add))
-      ],
-    );
+    final mediaQuery = MediaQuery.of(context);
+    final isLanscape = mediaQuery.orientation == Orientation.landscape;
+    final appBar = Platform.isIOS
+        ? CupertinoNavigationBar(
+            middle: Text('Personal Expenses'),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                GestureDetector(
+                  child: Icon(CupertinoIcons.add),
+                  onTap: () => _startAddNewTransaction(context),
+                )
+              ],
+            ),
+          )
+        : AppBar(
+            title: Text(widget.title),
+            actions: [
+              IconButton(
+                  onPressed: () => _startAddNewTransaction(context),
+                  icon: Icon(Icons.add))
+            ],
+          );
 
     final txListWidget = Container(
-      height:
-          (MediaQuery.of(context).size.height - appBar.preferredSize.height) *
-              0.75,
+      height: (mediaQuery.size.height -
+              (appBar as ObstructingPreferredSizeWidget).preferredSize.height) *
+          0.75,
       child: TransactionList(
           transactions: _transactions, deleteTx: _deleteTransaction),
     );
 
-    return Scaffold(
-      appBar: appBar,
-      body: SingleChildScrollView(
-          child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          if (isLanscape)
-            Row(
-              // ignore: prefer_const_literals_to_create_immutables
-              children: [
-                Text('Show Chart'),
-                Switch(
-                    value: _showChart,
-                    onChanged: (val) => setState(() {
-                          _showChart = val;
-                        })),
-              ],
-            ),
-          if (!isLanscape)
-            Container(
-                height: (MediaQuery.of(context).size.height -
-                        appBar.preferredSize.height) *
-                    0.3,
-                child: Chart(recentTransactions: _recentTransactions)),
-          if (!isLanscape) txListWidget,
-          if (isLanscape)
-            _showChart
-                ? Container(
-                    height: (MediaQuery.of(context).size.height -
-                            appBar.preferredSize.height) *
-                        0.25,
-                    child: Chart(recentTransactions: _recentTransactions))
-                : txListWidget
-        ],
-      )),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-        onPressed: () => _startAddNewTransaction(context),
-      ),
-    );
+    final body = SafeArea(
+        child: SingleChildScrollView(
+            child: Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        if (isLanscape)
+          Row(
+            // ignore: prefer_const_literals_to_create_immutables
+            children: [
+              Text(
+                'Show Chart',
+                style: Theme.of(context).textTheme.caption,
+              ),
+              Switch.adaptive(
+                  activeColor: Theme.of(context).accentColor,
+                  value: _showChart,
+                  onChanged: (val) => setState(() {
+                        _showChart = val;
+                      })),
+            ],
+          ),
+        if (!isLanscape)
+          Container(
+              height:
+                  (mediaQuery.size.height - appBar.preferredSize.height) * 0.3,
+              child: Chart(recentTransactions: _recentTransactions)),
+        if (!isLanscape) txListWidget,
+        if (isLanscape)
+          _showChart
+              ? Container(
+                  height:
+                      (mediaQuery.size.height - appBar.preferredSize.height) *
+                          0.25,
+                  child: Chart(recentTransactions: _recentTransactions))
+              : txListWidget
+      ],
+    )));
+
+    return Platform.isIOS
+        ? CupertinoPageScaffold(
+            child: body,
+            navigationBar: appBar,
+          )
+        : Scaffold(
+            appBar: appBar,
+            body: body,
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.centerFloat,
+            floatingActionButton: Platform.isIOS
+                ? Container()
+                : FloatingActionButton(
+                    child: Icon(Icons.add),
+                    onPressed: () => _startAddNewTransaction(context),
+                  ),
+          );
   }
 }
