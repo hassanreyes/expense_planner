@@ -19,8 +19,8 @@ class NewTransaction extends StatefulWidget {
 }
 
 class _NewTransactionState extends State<NewTransaction> {
-  var _titleController = TextEditingController();
-  var _amountController = TextEditingController();
+  final _titleController = TextEditingController();
+  final _amountController = TextEditingController();
   var _date = DateTime.now();
 
   void _SubmitData() {
@@ -42,7 +42,7 @@ class _NewTransactionState extends State<NewTransaction> {
   void _presentDatePiker() {
     showDatePicker(
             context: context,
-            initialDate: _date == null ? DateTime.now() : _date,
+            initialDate: _date ?? DateTime.now(),
             firstDate: DateTime(2000, 1, 1),
             lastDate: DateTime.now())
         .then((value) {
@@ -56,6 +56,7 @@ class _NewTransactionState extends State<NewTransaction> {
 
   @override
   Widget build(BuildContext context) {
+    print('Build from new tx');
     final mediaQuery = MediaQuery.of(context);
     final theme = Theme.of(context);
     return SingleChildScrollView(
@@ -73,12 +74,12 @@ class _NewTransactionState extends State<NewTransaction> {
                 children: [
                   TextField(
                     controller: _titleController,
-                    decoration: InputDecoration(labelText: 'Enter Title'),
+                    decoration: const InputDecoration(labelText: 'Enter Title'),
                     onSubmitted: (_) => _SubmitData(),
                   ),
                   TextField(
                     controller: _amountController,
-                    decoration: InputDecoration(labelText: 'Amount'),
+                    decoration: const InputDecoration(labelText: 'Amount'),
                     keyboardType: TextInputType.number,
                     onSubmitted: (_) => _SubmitData(),
                   ),
@@ -97,10 +98,10 @@ class _NewTransactionState extends State<NewTransaction> {
                     ),
                   ),
                   RaisedButton(
-                    child: Text('Add Transaction'),
                     color: theme.primaryColor,
                     textColor: theme.textTheme.button?.color,
                     onPressed: _SubmitData,
+                    child: const Text('Add Transaction'),
                   )
                 ])),
       ),

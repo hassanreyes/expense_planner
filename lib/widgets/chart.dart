@@ -20,10 +20,7 @@ class Chart extends StatelessWidget {
           totalSum += recentTransactions[i].amount;
         }
       }
-      return {
-        'day': DateFormat.E().format(weekDay).substring(0, 1),
-        'amount': totalSum
-      };
+      return {'day': DateFormat.E().format(weekDay).substring(0, 1), 'amount': totalSum};
     }).reversed.toList();
   }
 
@@ -35,11 +32,12 @@ class Chart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('Build from chart');
     return Card(
         elevation: 6,
-        margin: EdgeInsets.all(20),
+        margin: const EdgeInsets.all(20),
         child: Container(
-          padding: EdgeInsets.all(5),
+          padding: const EdgeInsets.all(5),
           child: Row(
               children: groupedTransactionValues
                   .map((e) => Flexible(
@@ -47,9 +45,7 @@ class Chart extends StatelessWidget {
                       child: ChartBar(
                         label: e['day'] as String,
                         spendingAmount: e['amount'] as double,
-                        spendingPctOfTotal: maxSpending == 0.0
-                            ? 0.0
-                            : (e['amount'] as double) / maxSpending,
+                        spendingPctOfTotal: maxSpending == 0.0 ? 0.0 : (e['amount'] as double) / maxSpending,
                       )))
                   .toList()),
         ));
